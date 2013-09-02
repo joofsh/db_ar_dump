@@ -1,8 +1,7 @@
-require 'db_ar_dump'
-require 'minitest/autorun'
+require 'minitest_helper'
 
-describe DbArDump do
+describe Foo do
   it 'can be created without arguments' do
-    DbArDump.foo.must_equal 'hi'
+    Foo.new.must_be_instance_of Foo
   end
 end
