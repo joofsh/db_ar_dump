@@ -1,10 +1,12 @@
-# DbArDump
+# Db_Ar_Dump
 
 A script that can be used to convert your current database into an active_record seed data file.
 
 ## Installation
 
-git clone the db_ar_dump.rb into your rails application's scripts/ directory. 
+The easiest way to use DB_Ar_Dump is to pull the script alone into your rails application's scripts/ directory:
+    cd script
+    curl -O https://raw.github.com/joofsh/db_ar_dump/master/db_ar_dump.rb
 
 ## Usage
 

@@ -2,6 +2,11 @@
 # Loops through specified tables and converts them to ActiveRecord create queries
 # Allows us to create a new seed data file from a currently existing db dump
 class DbArDump
+  EXCLUDE_LIST = [
+    "SchemaMigration",
+    "Session",
+    "DelayedJob"
+  ]
   class << self
 
     # Builds a string of attribute key/value pairs for a passed Active Record object
@@ -13,24 +18,28 @@ class DbArDump
       str.gsub! /,$/, ""
     end
 
-    def build_non_mass_assignable obj
+    def build_non_mass_assignable obj, var
       str = ""
-      str += (ENV['full_db'] == 'true' && obj.id ? "o.id = #{obj.id};" : "")
+      str += (obj.id ? "#{var}.id = #{obj.id};" : "")
       str += (obj.respond_to?('type') ? "o.type = \"#{obj.type}\";" : "")
-      str += "o.save"
+      str += "#{var}.save"
+    end
+
+    def tables_array
+      tables = ActiveRecord::Base.connection.tables.map {|t| t.singularize.camelize }
+      (tables - EXCLUDE_LIST)
     end
 
     def run
-      tables = ActiveRecord::Base.connection.tables.map {|t| t.singularize.camelize }
       seed_str = ""
-      tables.each do |t|
+      tables_array.each do |t|
+        var = t.first.downcase
         seed_str += "#{t}.destroy_all\n"
-        Class::const_get(t).all.each do |obj|
-          unless EXCLUDE_LIST[t] && EXCLUDE_LIST[t].include?(obj.id)
-            seed_str += "o = #{t}.new(#{build_attr_string obj}); #{build_non_mass_assignable obj}\n"
-          end
+        Class::const_get(t).find_each do |obj|
+          seed_str += "#{var} = #{t}.new(#{build_attr_string obj}); #{build_non_mass_assignable obj, var}\n"
         end
       end
+
       ActiveRecord::Base.connection.tables.each do |t|
         seed_str += "ActiveRecord::Base.connection.reset_pk_sequence!('#{t}')\n"
       end
