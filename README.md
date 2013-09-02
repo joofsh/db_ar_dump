@@ -5,6 +5,7 @@ A script that can be used to convert your current database into an active_record
 ## Installation
 
 The easiest way to use DB_Ar_Dump is to pull the script alone into your rails application's scripts/ directory:
+
     cd script
     curl -O https://raw.github.com/joofsh/db_ar_dump/master/db_ar_dump.rb
 
